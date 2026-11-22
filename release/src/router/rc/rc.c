@@ -4006,3 +4006,47 @@ void exe_eu_wa_rr(void){
 
 }
 #endif
+
+
+/*
+ * ASUS_388_GPL_GAP_STUBS
+ *
+ * Four functions are called by code compiled for XT8PRO but published in no
+ * object we can link:
+ *
+ *   acs_set_chwt          rc.c debug CLI ("rc set_chwt <n>")
+ *   wl_get_chlist_band    rc.c debug CLI ("rc ch_band <if>")
+ *   update_rf_para        init.c case MODEL_XT8PRO
+ *   check_wlx_nband_type  init.c init_main()
+ *   reset_exclvalid       services.c start_acsd()
+ *   mtd_export_crashlog   init.c (CRASHLOG; the XT8 broadcom.o we take
+ *                         for single_led_status/wlcscan does not carry it)
+ *   wan_phy_led_pinmux    ate.c LED test path; exported only by board
+ *                         objects that lack single_led_status
+ *
+ * Their usual home is rc/sysdeps/init-broadcom.c, which carries the only
+ * implementations in some drops, but that object is not part of every link
+ * (OBJS gates it on CONFIG_BCMWL5) - a definition there was invisible. These
+ * are weak so a real implementation still wins if it is linked, and they make
+ * the gap explicit rather than silently unresolved.
+ *
+ * acs_set_chwt / wl_get_chlist_band: the 388 sibling's amas_utils.o and
+ * api-broadcom.o export them, but we keep the board's objects for
+ * acs_excl_list_eu_10min and get_bonding_port_status; the symbols never
+ * coexist in one build.
+ * update_rf_para / check_wlx_nband_type: only XT8/4912 objects export them,
+ * with different RF tables / band maps.
+ */
+#if defined(__GNUC__)
+#define ASUS_GAP_WEAK __attribute__((weak))
+#else
+#define ASUS_GAP_WEAK
+#endif
+
+ASUS_GAP_WEAK int acs_set_chwt(int unit) { (void)unit; return 0; }
+ASUS_GAP_WEAK int wl_get_chlist_band(char *wlif) { (void)wlif; return 0; }
+ASUS_GAP_WEAK void update_rf_para(void) { }
+ASUS_GAP_WEAK void check_wlx_nband_type(void) { }
+ASUS_GAP_WEAK int reset_exclvalid(void) { return 0; }
+ASUS_GAP_WEAK void mtd_export_crashlog(void) { }
+ASUS_GAP_WEAK void wan_phy_led_pinmux(int force) { (void)force; }

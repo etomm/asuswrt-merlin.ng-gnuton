@@ -4391,6 +4391,10 @@ int ate_dev_status(void)
 			system("bluetoothd &");
 		}
 #endif
+#if defined(RTCONFIG_BT_CONN)
+		/* check_bluetooth_device() is only built when RTCONFIG_BT_CONN is
+		   set (rc/services.c).  The 388 GPL calls it unconditionally, which
+		   breaks the link on boards without Bluetooth (XT8PRO). */
 		if(have_bt_device == 1){
 			for(retry = 0; retry < RETRY_MAX; retry++){
 				extern int check_bluetooth_device(const char *bt_dev);
@@ -4408,6 +4412,7 @@ int ate_dev_status(void)
 				ret = 0;
 			}
 		}
+#endif
 	}
 	if(have_bt_device == 1){
 		len = snprintf(p, remain, ",hci0=%c", result);

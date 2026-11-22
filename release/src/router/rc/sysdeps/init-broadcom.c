@@ -4708,6 +4708,7 @@ void fill_cfe_block();
 #if defined(RTCONFIG_HND_ROUTER_AX_6756) \
 		|| defined(RTAX86U)
 void sync_cfe_mac();
+
 #endif
 
 void init_syspara(void)
